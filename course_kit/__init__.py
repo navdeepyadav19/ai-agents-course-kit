@@ -89,6 +89,16 @@ def customer_messages(history):
     return [item["content"] for item in history if isinstance(item, dict) and item.get("role") == "user"]
 
 
+def tool(name, description, **inputs):
+    """Shorthand for one entry in a tool menu: tool("get_x", "What it does.", some_id="string").
+
+    It writes the same structure you wrote out by hand in Module 4, Cell 3c.
+    """
+    return {"type": "function", "name": name, "description": description,
+            "parameters": {"type": "object", "properties": {k: {"type": v} for k, v in inputs.items()},
+                           "required": list(inputs), "additionalProperties": False}}
+
+
 ARRIVED = {}      # filter name -> the customer messages the next agent received (filled by watch)
 
 
@@ -102,4 +112,4 @@ def watch(passes):
 
 
 __all__ = ["MODEL", "STRONG_MODEL", "PRICES", "USAGE", "connect", "no_thinking", "ask", "cost",
-           "show_steps", "customer_messages", "ARRIVED", "watch"]
+           "show_steps", "customer_messages", "ARRIVED", "watch", "tool"]

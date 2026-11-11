@@ -1,4 +1,4 @@
-"""Module 5 practice material: test messages for handoffs, memory, routing and fallbacks."""
+"""Module 5 practice material: the agent rules, two ready-made specialists, and test messages for handoffs, memory, routing and fallbacks."""
 HANDOFF_QUESTIONS = ["I'm candidate CAND-3. Can you book my panel interview for 2026-11-04 at 10:00?",
                      "What's the salary range for this role?"]
 

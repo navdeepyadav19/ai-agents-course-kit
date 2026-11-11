@@ -1,4 +1,4 @@
-"""Module 5 practice material: test messages for handoffs, memory, routing and fallbacks."""
+"""Module 5 practice material: the agent rules, two ready-made specialists, and test messages for handoffs, memory, routing and fallbacks."""
 HANDOFF_QUESTIONS = ["Can I book the first open slot with Dr. Patel? My name is Sam Rivera.",
                      "How much is an ECG if I pay myself?"]
 
