@@ -1,6 +1,6 @@
 [project]
 name = "course-kit"
-version = "0.1.0"
+version = "0.2.0"
 description = "Shared setup, company data and small helpers for the AI Agents course notebooks."
 requires-python = ">=3.10"
 dependencies = ["openai"]
@@ -9,5 +9,5 @@ dependencies = ["openai"]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["course_kit"]
+[tool.setuptools.packages.find]
+include = ["course_kit*"]

@@ -10,24 +10,32 @@ PRICES = {MODEL: (0.10, 0.50), STRONG_MODEL: (1.00, 5.00)}   # dollars per 1M to
 
 USAGE = []        # one row per ask(): (model, input tokens, output tokens)
 _client = None
+_model = MODEL    # the model ask() uses when you don't name one
 
 
-def connect():
-    """Read OPENAI_API_KEY from Colab Secrets and return the client. Module 1, Cell 2 did this by hand."""
-    global _client
+def connect(provider="openai"):
+    """Read your key from Colab Secrets and return the client. Module 1, Cell 2 did this by hand.
+
+    connect() uses OPENAI_API_KEY. connect("openrouter") uses OPENROUTER_API_KEY instead (Module 1, Topic 1.6).
+    """
+    global _client, _model
     from google.colab import userdata
     from openai import OpenAI
-    key = userdata.get("OPENAI_API_KEY")
+    name = "OPENROUTER_API_KEY" if provider == "openrouter" else "OPENAI_API_KEY"
+    key = userdata.get(name)
     if not key:
-        raise SystemExit("No OPENAI_API_KEY found. Click the key icon in Colab's left sidebar, add it, "
+        raise SystemExit(f"No {name} found. Click the key icon in Colab's left sidebar, add it, "
                          "and switch on 'Notebook access'.")
-    try:   # the Agents SDK (Module 4 onward) uses the same key
-        from agents import set_default_openai_key
-        set_default_openai_key(key)
-    except ImportError:
-        pass
-    _client = OpenAI(api_key=key)
-    print("Connected. Default model:", MODEL, "| strong model:", STRONG_MODEL)
+    if provider == "openrouter":
+        _client, _model = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=key), "openai/" + MODEL
+    else:
+        _client, _model = OpenAI(api_key=key), MODEL
+        try:   # the Agents SDK (Module 4 onward) uses the same key
+            from agents import set_default_openai_key
+            set_default_openai_key(key)
+        except ImportError:
+            pass
+    print("Connected. Default model:", _model)
     return _client
 
 
@@ -38,9 +46,15 @@ def no_thinking():
     return ModelSettings(reasoning=Reasoning(effort="none"))
 
 
-def ask(model, instructions, question, effort="none"):
-    """One model call, as written out in Module 1. Returns the text and records the tokens in USAGE."""
-    response = _client.responses.create(model=model, instructions=instructions, input=question,
+def ask(instructions, user_input, model=None, effort="none"):
+    """Send instructions plus a message (or a whole conversation). Return the answer text.
+
+    This is the function you wrote in Module 1, Cell 5. Two optional extras were added later:
+    model= to use a different model for one call, and effort= to let the model think first.
+    Every call also records its tokens in USAGE.
+    """
+    model = model or _model
+    response = _client.responses.create(model=model, instructions=instructions, input=user_input,
                                         reasoning={"effort": effort})
     USAGE.append((model, response.usage.input_tokens, response.usage.output_tokens))
     return response.output_text
